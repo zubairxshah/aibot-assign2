@@ -11,7 +11,7 @@ async def main(message: cl.Message):
     user_query = message.content
     print(f"DEBUG MAIN: Original query: '{user_query}'")
     use_web_search = user_query.lower().startswith("search:")
-    use_weather = user_query.lower().startswith("weather in")
+    use_weather = user_query.lower().startswith("weather in") or "weather" in user_query.lower() and (" for " in user_query.lower() or " update" in user_query.lower())
     
     # Auto-detect search queries if not explicitly prefixed
     if not use_web_search and not use_weather:
@@ -26,7 +26,15 @@ async def main(message: cl.Message):
             use_web_search = True
     
     print(f"DEBUG MAIN: use_web_search={use_web_search}, use_weather={use_weather}")
-    query = user_query[7:].strip() if user_query.lower().startswith("search:") else user_query[10:].strip() if user_query.lower().startswith("weather in") else user_query
+    if user_query.lower().startswith("search:"):
+        query = user_query[7:].strip()
+    elif user_query.lower().startswith("weather in"):
+        query = user_query[10:].strip()
+    elif use_weather and " for " in user_query.lower():
+        # Extract city from "weather update for Alaska" format
+        query = user_query.lower().split(" for ")[1].strip()
+    else:
+        query = user_query
     print(f"DEBUG MAIN: Processed query: '{query}'")
     response = await run_agent(query, use_web_search=use_web_search, use_weather=use_weather)
     # Format JSON for display

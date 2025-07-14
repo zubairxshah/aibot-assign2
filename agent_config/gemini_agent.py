@@ -139,10 +139,16 @@ async def run_agent(query: str, use_web_search: bool = False, use_weather: bool 
             api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
             if not api_key:
                 return json.dumps({"answer": "Gemini API key not configured. Please set GEMINI_API_KEY or GOOGLE_API_KEY environment variable.", "source": "Error"}, indent=2)
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            response = await model.generate_content_async(query)
-            response_text = response.text if response.text else "No response from Gemini"
-            return json.dumps({"answer": response_text, "source": "Gemini"}, indent=2)
+            
+            # Use synchronous Gemini call to avoid event loop conflicts
+            try:
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                response = model.generate_content(query)  # Synchronous call
+                response_text = response.text if response.text else "No response from Gemini"
+                return json.dumps({"answer": response_text, "source": "Gemini"}, indent=2)
+            except Exception as gemini_error:
+                print(f"DEBUG: Gemini error: {str(gemini_error)}")
+                return json.dumps({"answer": f"Gemini API error: {str(gemini_error)}", "source": "Error"}, indent=2)
             
     except Exception as e:
         print(f"DEBUG: Exception occurred: {str(e)}")
