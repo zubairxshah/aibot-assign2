@@ -9,13 +9,23 @@ import json
 # Load environment variables
 load_dotenv()
 
-# Debug: Print API keys
-# print("GEMINI_API_KEY:", os.getenv("GEMINI_API_KEY"))
-# print("SERPER_API_KEY:", os.getenv("SERPER_API_KEY"))
-# print("WEATHER_API_KEY:", os.getenv("WEATHER_API_KEY"))
+# Debug: Print all environment variables for debugging
+print("=== ENVIRONMENT VARIABLES DEBUG ===")
+print("GEMINI_API_KEY:", os.getenv("GEMINI_API_KEY"))
+print("GOOGLE_API_KEY:", os.getenv("GOOGLE_API_KEY"))
+print("SERPER_API_KEY:", os.getenv("SERPER_API_KEY"))
+print("WEATHER_API_KEY:", os.getenv("WEATHER_API_KEY"))
+print("All env vars:", [key for key in os.environ.keys() if 'API' in key or 'KEY' in key])
+print("===================================")
 
-# Configure Gemini client
-genai.configure(api_key=os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
+# Configure Gemini client with better error handling
+api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    print("ERROR: No API key found in environment variables!")
+    raise ValueError("Missing Gemini API key")
+else:
+    print(f"Using API key: {api_key[:10]}...{api_key[-4:]}")
+    genai.configure(api_key=api_key)
 
 # Pydantic schema for structured output
 class AssistantResponse(BaseModel):
