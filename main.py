@@ -15,11 +15,14 @@ async def main(message: cl.Message):
     
     # Auto-detect search queries if not explicitly prefixed
     if not use_web_search and not use_weather:
-        search_keywords = ["restaurants", "hotels", "shops", "places", "find", "where", "best", "top", "list", 
-                          "hospitals", "clinics", "doctors", "vets", "veterinary", "medical", "pharmacy", 
-                          "schools", "colleges", "universities", "banks", "atm", "malls", "markets", 
-                          "gyms", "fitness", "salons", "spas", "cafes", "coffee", "search", "pools", "parks", "libraries", "museums", "theaters", "cinemas", "events", "activities"]
-        if any(keyword in user_query.lower() for keyword in search_keywords):
+        # Only trigger search for location-based queries or explicit search terms
+        location_indicators = [" in ", " near ", " at "]
+        search_keywords = ["restaurants", "hotels", "shops", "hospitals", "clinics", "gyms", "malls"]
+        
+        has_location = any(loc in user_query.lower() for loc in location_indicators)
+        has_search_keyword = any(keyword in user_query.lower() for keyword in search_keywords)
+        
+        if (has_location and has_search_keyword) or user_query.lower().startswith(("find", "where", "best", "top", "list")):
             use_web_search = True
     
     print(f"DEBUG MAIN: use_web_search={use_web_search}, use_weather={use_weather}")

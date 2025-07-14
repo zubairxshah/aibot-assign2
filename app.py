@@ -39,11 +39,14 @@ if prompt := st.chat_input("What would you like to know?"):
     
     # Auto-detect search queries if not explicitly prefixed
     if not use_web_search and not use_weather:
-        search_keywords = ["restaurants", "hotels", "shops", "places", "find", "where", "best", "top", "list", 
-                          "hospitals", "clinics", "doctors", "vets", "veterinary", "medical", "pharmacy", 
-                          "schools", "colleges", "universities", "banks", "atm", "malls", "markets", 
-                          "gyms", "fitness", "salons", "spas", "cafes", "coffee", "search"]
-        if any(keyword in user_query.lower() for keyword in search_keywords):
+        # Only trigger search for location-based queries or explicit search terms
+        location_indicators = [" in ", " near ", " at "]
+        search_keywords = ["restaurants", "hotels", "shops", "hospitals", "clinics", "gyms", "malls"]
+        
+        has_location = any(loc in user_query.lower() for loc in location_indicators)
+        has_search_keyword = any(keyword in user_query.lower() for keyword in search_keywords)
+        
+        if (has_location and has_search_keyword) or user_query.lower().startswith(("find", "where", "best", "top", "list")):
             use_web_search = True
     
     # Process query
@@ -52,8 +55,18 @@ if prompt := st.chat_input("What would you like to know?"):
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            # Run the async function
-            response = asyncio.run(run_agent(query, use_web_search=use_web_search, use_weather=use_weather))
+            # Run the async function with proper event loop handling
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_closed():
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                response = loop.run_until_complete(run_agent(query, use_web_search=use_web_search, use_weather=use_weather))
+            except RuntimeError:
+                # If there's still an issue, create a new event loop
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                response = loop.run_until_complete(run_agent(query, use_web_search=use_web_search, use_weather=use_weather))
             
             # Format response
             try:
