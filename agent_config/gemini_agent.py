@@ -142,7 +142,7 @@ async def run_agent(query: str, use_web_search: bool = False, use_weather: bool 
             
             # Use synchronous Gemini call to avoid event loop conflicts
             try:
-                model = genai.GenerativeModel("gemini-1.5-flash")
+                model = genai.GenerativeModel("gemini-2.5-flash")
                 response = model.generate_content(query)  # Synchronous call
                 response_text = response.text if response.text else "No response from Gemini"
                 return json.dumps({"answer": response_text, "source": "Gemini"}, indent=2)
