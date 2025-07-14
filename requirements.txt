@@ -1,4 +1,5 @@
 chainlit
+streamlit
 google-generativeai
 aiohttp
 pydantic
