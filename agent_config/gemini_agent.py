@@ -15,7 +15,7 @@ load_dotenv()
 # print("WEATHER_API_KEY:", os.getenv("WEATHER_API_KEY"))
 
 # Configure Gemini client
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
 
 # Pydantic schema for structured output
 class AssistantResponse(BaseModel):
