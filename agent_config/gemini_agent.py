@@ -21,8 +21,8 @@ print("===================================")
 # Configure Gemini client with better error handling
 api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 if not api_key:
-    print("ERROR: No API key found in environment variables!")
-    raise ValueError("Missing Gemini API key")
+    print("WARNING: No API key found in environment variables!")
+    print("App will start but Gemini features will not work")
 else:
     print(f"Using API key: {api_key[:10]}...{api_key[-4:]}")
     genai.configure(api_key=api_key)
@@ -136,6 +136,9 @@ async def run_agent(query: str, use_web_search: bool = False, use_weather: bool 
             return json.dumps({"answer": search_results, "source": source}, indent=2)
         
         else:
+            api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+            if not api_key:
+                return json.dumps({"answer": "Gemini API key not configured. Please set GEMINI_API_KEY or GOOGLE_API_KEY environment variable.", "source": "Error"}, indent=2)
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = await model.generate_content_async(query)
             response_text = response.text if response.text else "No response from Gemini"
