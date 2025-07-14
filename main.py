@@ -4,7 +4,7 @@ import json
 
 @cl.on_chat_start
 async def start():
-    await cl.Message(content="Hello! I'm your Gemini-powered AI assistant. Ask me anything! Use 'search:' for web search or 'weather in' for weather info. Responses are in JSON.").send()
+    await cl.Message(content="Hello! I'm your Gemini-powered AI assistant. Ask me anything! Use 'search:' for web search or 'weather in' for weather info.").send()
 
 @cl.on_message
 async def main(message: cl.Message):
@@ -18,7 +18,7 @@ async def main(message: cl.Message):
         search_keywords = ["restaurants", "hotels", "shops", "places", "find", "where", "best", "top", "list", 
                           "hospitals", "clinics", "doctors", "vets", "veterinary", "medical", "pharmacy", 
                           "schools", "colleges", "universities", "banks", "atm", "malls", "markets", 
-                          "gyms", "fitness", "salons", "spas", "cafes", "coffee", "search"]
+                          "gyms", "fitness", "salons", "spas", "cafes", "coffee", "search", "pools", "parks", "libraries", "museums", "theaters", "cinemas", "events", "activities"]
         if any(keyword in user_query.lower() for keyword in search_keywords):
             use_web_search = True
     
